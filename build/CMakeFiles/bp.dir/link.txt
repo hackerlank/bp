@@ -1,0 +1,1 @@
+/usr/bin/c++   -Wall -pedantic -g -std=c++11   CMakeFiles/bp.dir/bp.cpp.o  -o bin/bp -rdynamic 

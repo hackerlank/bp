@@ -1,0 +1,5 @@
+project(bp)
+set(APP_SRC bp.cpp)
+set(CMAKE_CXX_FLAGS "-Wall -pedantic -g -std=c++11")
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+add_executable(bp ${APP_SRC})

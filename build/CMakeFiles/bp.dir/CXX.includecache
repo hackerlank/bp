@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/edolphin/documents/cpp/bp/bp.cpp
+stdio.h
+-
+vector
+-
+algorithm
+-
+functional
+-
+time.h
+-
+math.h
+-
+
