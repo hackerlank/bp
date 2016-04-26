@@ -35,10 +35,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/edolphin/documents/cpp/bp
+CMAKE_SOURCE_DIR = /home/yangdongfeng/documents/cpp/bp
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/edolphin/documents/cpp/bp/build
+CMAKE_BINARY_DIR = /home/yangdongfeng/documents/cpp/bp/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/bp.dir/depend.make
@@ -51,17 +51,17 @@ include CMakeFiles/bp.dir/flags.make
 
 CMakeFiles/bp.dir/bp.cpp.o: CMakeFiles/bp.dir/flags.make
 CMakeFiles/bp.dir/bp.cpp.o: ../bp.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/edolphin/documents/cpp/bp/build/CMakeFiles $(CMAKE_PROGRESS_1)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/yangdongfeng/documents/cpp/bp/build/CMakeFiles $(CMAKE_PROGRESS_1)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/bp.dir/bp.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/bp.dir/bp.cpp.o -c /home/edolphin/documents/cpp/bp/bp.cpp
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/bp.dir/bp.cpp.o -c /home/yangdongfeng/documents/cpp/bp/bp.cpp
 
 CMakeFiles/bp.dir/bp.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/bp.dir/bp.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/edolphin/documents/cpp/bp/bp.cpp > CMakeFiles/bp.dir/bp.cpp.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/yangdongfeng/documents/cpp/bp/bp.cpp > CMakeFiles/bp.dir/bp.cpp.i
 
 CMakeFiles/bp.dir/bp.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/bp.dir/bp.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/edolphin/documents/cpp/bp/bp.cpp -o CMakeFiles/bp.dir/bp.cpp.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/yangdongfeng/documents/cpp/bp/bp.cpp -o CMakeFiles/bp.dir/bp.cpp.s
 
 CMakeFiles/bp.dir/bp.cpp.o.requires:
 .PHONY : CMakeFiles/bp.dir/bp.cpp.o.requires
@@ -97,6 +97,6 @@ CMakeFiles/bp.dir/clean:
 .PHONY : CMakeFiles/bp.dir/clean
 
 CMakeFiles/bp.dir/depend:
-	cd /home/edolphin/documents/cpp/bp/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/edolphin/documents/cpp/bp /home/edolphin/documents/cpp/bp /home/edolphin/documents/cpp/bp/build /home/edolphin/documents/cpp/bp/build /home/edolphin/documents/cpp/bp/build/CMakeFiles/bp.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/yangdongfeng/documents/cpp/bp/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/yangdongfeng/documents/cpp/bp /home/yangdongfeng/documents/cpp/bp /home/yangdongfeng/documents/cpp/bp/build /home/yangdongfeng/documents/cpp/bp/build /home/yangdongfeng/documents/cpp/bp/build/CMakeFiles/bp.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/bp.dir/depend
 

@@ -1,4 +1,4 @@
-# Install script for directory: /home/edolphin/documents/cpp/bp
+# Install script for directory: /home/yangdongfeng/documents/cpp/bp
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/edolphin/documents/cpp/bp/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/yangdongfeng/documents/cpp/bp/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
