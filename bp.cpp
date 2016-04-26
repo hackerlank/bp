@@ -5,19 +5,34 @@
 #include <time.h>
 #include <math.h>
 
+struct IData {
+	IData() {}
+	IData(std::vector<double> X) {
+		this->X = X;
+	}
+	std::vector<double> X;
+};
+
+struct OData {
+	std::vector<double> Y;
+};
+
 struct IOData {
-	IOData(){
-		this->x = this->y = 0;
+	IOData(){}
+	IOData(IData in, OData out) {
+		this->input = in;
+		this->output = out;
 	}
-	IOData(int x, int y) {
-		this->x = x;
-		this->y = y;
-	}
-	int x, y;
+	IData input;
+	OData output;
 };
 
 IOData generateDataFunction(int x) {
-	return IOData(x, 3 * x);
+	IData in;
+	in.X.push_back(x);
+	OData out;
+	out.Y.push_back(3*x);
+	return IOData(in, out);
 }
 
 std::vector<IOData> generateData(int num) {
@@ -30,46 +45,63 @@ std::vector<IOData> generateData(int num) {
 
 struct NormalizationData {
 	NormalizationData() {}
-	NormalizationData(double d) {
-		this->d = d;
+
+	NormalizationData(std::vector<double> D) {
+		this->D = D;
 	}
-	double d;
+	std::vector<double> D;
 };
 
-template<class T>
-T min(std::vector<T> container) {
-	typename std::vector<T>::iterator it = container.begin();
-	T res = 0x7fffffff;
-	for (; it != container.end(); ++it) {
-		if (res > *it) {
-			res = *it;
+std::vector<double> min(std::vector<IData> container) {
+	typename std::vector<double> res;
+	for (int i = 0; i < container[0].X.size(); ++i) {
+		double min = container[0].X[i];
+		for (int j = 0; j < container.size(); ++j) {
+			if (min > container[j].X[i]) {
+				min = container[j].X[i];
+			}	
 		}
+		res.push_back(min);
 	}
 	return res;
 }
 
-template<class T>
-T max(std::vector<T> container) {
-	typename std::vector<T>::iterator it = container.begin();
-	T res = 0x80000000;
-	for (; it != container.end(); ++it) {
-		if (res < *it) {
-			res = *it;
+std::vector<double> max(std::vector<IData> container) {
+	typename std::vector<double> res;
+	for (int i = 0; i < container[0].X.size(); ++i) {
+		double max = container[0].X[i];
+		for (int j = 0; j < container.size(); ++j) {
+			if (max < container[j].X[i]) {
+				max = container[j].X[i];
+			}	
 		}
+		res.push_back(max);
 	}
 	return res;
 }
 
-double mapMinMax(int x, int min, int max) {
-	return (double)(x-min) / (max - min);
+double mapMinMax(double x, double min, double max) {
+	return (x-min) / (max - min);
 }
 
 template<class O, class I>
 std::vector<O> map(std::vector<I> data, std::function<O(I)> callback) {
-	std::vector<O> res(data.size());
+	std::vector<O> res;
 	typename std::vector<I>::iterator it = data.begin();
 	for(; it != data.end(); ++it) {
 		res.push_back(callback(*it));
+	}
+	return res;
+}
+
+template<class O, class I>
+std::vector<O> map(std::vector<I> data, std::function<O(I, int)> callback) {
+	std::vector<O> res;
+	typename std::vector<I>::iterator it = data.begin();
+	int i = 0;
+	for(; it != data.end(); ++it) {
+		res.push_back(callback(*it, i));
+		++i;
 	}
 	return res;
 }
@@ -81,16 +113,28 @@ double sum(std::vector<T> data) {
 	return res;
 }
 
-std::vector<NormalizationData> normalization(std::vector<IOData> data) {
-	std::vector<int> idata = map<int, IOData>(data, [](IOData data) {return data.x;});
-	int ma = max(idata);
-	int mi = min(idata);
-	return map<NormalizationData, int>(idata, [ma, mi](int x) {return NormalizationData(mapMinMax(x, mi, ma));});
+//std::vector<NormalizationData> normalization(std::vector<IData> idata, std::vector<double> iMin, std::vector<double> iMax) {
+	//std::vector<NormalizationData> res = map<NormalizationData, IData>(idata, [iMin, iMax](IData d) { 
+			//return NormalizationData(map<double, double>(d.X, [iMin, iMax](double x, int i){ return mapMinMax(x, iMin[i], iMax[i]);})); 
+		//});
+	//return res;
+//}
+
+std::vector<NormalizationData> normalization(std::vector<IData> idata, std::vector<double> iMin, std::vector<double> iMax) {
+	std::vector<NormalizationData> res;
+	for (auto data : idata) {
+		NormalizationData normalizationData;
+		for (int i = 0; i < data.X.size(); ++i) {
+			normalizationData.D.push_back(mapMinMax(data.X[i], iMin[i], iMax[i]));
+		}
+		res.push_back(normalizationData);
+	}
+	return res;
 }
 
 template<class T>
 std::vector<T> rands(int num) {
-	std::vector<T> res(num);
+	std::vector<T> res;
 	for (int i = 0; i < num; ++i) {
 		res.push_back(rand());
 	}
@@ -125,59 +169,144 @@ double dot(std::vector<double> v1, std::vector<double> v2) {
 	return res;
 }
 
+std::vector<double> vecCalc(std::vector<double> v1, std::vector<double> v2, std::function<double(double, double)> op) {
+	if (v1.size() != v2.size()) {
+		return std::vector<double>();	
+	}
+
+	return map<double, double>(v1, [op, v2](double a, int i) { return op(a, v2[i]);});
+}
+
+std::vector<double> mul(std::vector<double> v1, std::vector<double> v2) {
+	return vecCalc(v1, v2, [](double a, double b) {return a * b;});
+}
+
+std::vector<double> mul(std::vector<double> v, double a) {
+	return map<double, double>(v, [a](double b) {return a * b;});
+}
+
+std::vector<double> plus(std::vector<double> v1, std::vector<double> v2) {
+	return vecCalc(v1, v2, [](double a, double b) {return a + b;});
+}
+
+std::vector<double> operator + (std::vector<double> v1, std::vector<double> v2) {
+	return plus(v1, v2);
+}
+
+std::vector<double> operator * (std::vector<double> v1, std::vector<double> v2) {
+	return mul(v1, v2);
+}
+
+std::vector<double> operator * (std::vector<double> v, double a) {
+	return mul(v, a);
+}
+
+std::vector<double> operator * (double a, std::vector<double> v) {
+	return mul(v, a);
+}
+
+void printf(std::vector<double> v) {
+	std::for_each(v.begin(), v.end(), [](double d) {printf("%lf ", d);});
+	printf("\n");
+}
+
 int main(int argc, char *argv[])
 {
 	srand((unsigned)time(NULL));
 
 	std::vector<IOData> trainData = generateData(10000);
-	std::vector<NormalizationData> NormalizationData = normalization(trainData);
+	std::vector<IData> idata = map<IData, IOData>(trainData, [](IOData data) {return data.input;});
+	std::vector<OData> odata = map<OData, IOData>(trainData, [](IOData data) {return data.output;});
+	std::vector<double> iMin = min(idata);
+	std::vector<double> iMax = max(idata);
+	std::vector<NormalizationData> normalizationData = normalization(idata, iMin, iMax);
+	idata = map<IData, NormalizationData>(normalizationData, [](NormalizationData data) {return IData(data.D);});
 
 	int inputnum = 1;
 	int outputnum = 1;
 	int hidenum = 2;
 	double ita = 0.5;
 
-	std::vector<std::vector<int> > weightHide = rands<int>(hidenum, inputnum);
-	std::vector<std::vector<int> > weightOutput = rands<int>(hidenum, outputnum);
-	std::vector<int>  thresholdHide = rands<int>(hidenum);
-	std::vector<int> thresholdOutput = rands<int>(outputnum);
+	std::vector<std::vector<double> > weightHide = rands<double>(hidenum, inputnum);
+	std::vector<std::vector<double> > weightOutput = rands<double>(outputnum, hidenum);
+	std::vector<double>  thresholdHide = rands<double>(hidenum);
+	std::vector<double> thresholdOutput = rands<double>(outputnum);
 
 	// train
 	
 	for (int oi  = 0;  oi< 20; oi++) {
-		
-		for (int i = 0; i < trainData.size(); ++i) {
-			int x = trainData[i].x;
-			int y = trainData[i].y;
 
-			std::vector<double> H(hidenum);
-			for (int j = 0; j < hidenum; ++j) {
-				double tmp = x * weightHide[j][0]  + thresholdHide[j];
-				double h = logsig(tmp);
-				H.push_back(h);	
+		for (int iditer = 0; iditer < idata.size(); ++iditer) {
+			std::vector<double> H;
+			for (int i = 0; i < hidenum; ++i) {
+				double h = dot(idata[iditer].X, weightHide[i]);
+				double h2 = logsig(h);
+				H.push_back(h2);
 
-				double O = h * weightOutput[j][0] - thresholdHide[0];
-				double e = y - O;
+			}	
 
-				weightHide[j][0] = weightHide[j][0] + ita * h * ( 1-h) * x * weightOutput[j][0] * e;
-				weightOutput[j][0] = weightOutput[j][0] + ita * h * e;
-				thresholdHide[j] = thresholdHide[j] + ita * h * (1-h) * weightOutput[j][0] * e;
-				thresholdOutput[0] = thresholdOutput[0] + e;
+			std::vector<double> O;
+			for (int i = 0; i < outputnum; ++i) {
+				double o = dot(H, weightOutput[i]);
+				O.push_back(o);
 			}
 
-		}	
+
+			std::vector<double> E = map<double, double>(odata[iditer].Y, [O](double y, int i) {return y - O[i];});
+			for (int j = 0; j < hidenum; ++j) {
+				for (int k = 0; k < outputnum; ++k) {
+					weightOutput[k][j] = weightOutput[k][j] + ita * H[j] * E[k];
+				}
+			}
+			//for (int i = 0; i < hidenum; ++i) {
+				//weightOutput[i] = weightOutput[i] + ita * E * O;
+			//}
+
+			for (int i = 0; i < inputnum; ++i) {
+				for (int j = 0; j < hidenum; ++j) {
+					double sum = 0;
+					for (int k = 0; k < outputnum; ++k) {
+						sum += weightOutput[k][j] * E[k];	
+					}
+					weightHide[j][i] = weightHide[j][i] + ita * H[j] * (1 - H[j]) * idata[iditer].X[i] * sum;
+				}
+			}
+		}
+
 	}
 
-	std::vector<int> idata = map<int, IOData>(trainData, [](IOData data) {return data.x;});
-	int ma = max(idata);
-	int mi = min(idata);
-	for (int j = 0; j < hidenum; ++j) {
-		double tmp = mapMinMax(50, mi, ma) * weightHide[j][0] + thresholdHide[j];
-		double h = logsig(tmp);
-		double O = weightOutput[j][0] * h + thresholdOutput[j];
-		printf("%lf\n\n", O);
-	}
+	printf("weightHide:\n");
+	printf(weightHide[0]);
+	printf(weightHide[1]);
+	printf("weightOutput:\n");
+	printf(weightOutput[0]);
+
+	std::vector<IOData> testData = generateData(2);
+	std::vector<IData> itdata = map<IData, IOData>(testData, [](IOData data) {return data.input;});
+	std::vector<OData> otdata = map<OData, IOData>(testData, [](IOData data) {return data.output;});
+	//std::vector<double> itMin = min(itdata);
+	//std::vector<double> itMax = max(itdata);
+	std::vector<NormalizationData> tnormalizationData = normalization(itdata, iMin, iMax);
+	itdata = map<IData, NormalizationData>(tnormalizationData, [](NormalizationData data) {return IData(data.D);});
 		
+	for (int iditer = 0; iditer < itdata.size(); ++iditer) {
+		std::vector<double> H;
+		for (int i = 0; i < hidenum; ++i) {
+			double h = dot(itdata[iditer].X, weightHide[i]);
+			double h2 = logsig(h);
+			H.push_back(h2);
+
+		}	
+
+		std::vector<double> O;
+		for (int i = 0; i < outputnum; ++i) {
+			double o = dot(H, weightOutput[i]);
+			O.push_back(o);
+		}
+		printf(itdata[iditer].X);
+		printf(O);
+	}
+	
 	return 0;
 }
 
